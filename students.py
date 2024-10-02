@@ -12,30 +12,6 @@ import sys
 
 pd.set_option('display.max_columns', None)
 
-def perform_pca(data):
-    # Step 2: Apply PCA (specifying the number of components, e.g., 2 components)
-    pca = PCA(n_components=2)  # You can adjust the number of components based on your requirement
-    X_pca = pca.fit_transform(X_scaled)
-
-    # Step 3: Convert the PCA results into a DataFrame (optional)
-    pca_df = pd.DataFrame(X_pca, columns=['Principal Component 1', 'Principal Component 2'])
-
-    # Step 4: Add the target variable back to the PCA DataFrame for analysis
-    pca_df['Exam_Score'] = data['Exam_Score'].values
-
-    # Step 5: Visualize the variance explained by each principal component (optional)
-    explained_variance = pca.explained_variance_ratio_
-    print(f'Explained variance by components: {explained_variance}')
-
-    # Step 6: Visualize the PCA results (optional)
-    plt.figure(figsize=(8, 6))
-    plt.scatter(pca_df['Principal Component 1'], pca_df['Principal Component 2'], c=pca_df['Exam_Score'], cmap='viridis')
-    plt.colorbar(label='Exam Score')
-    plt.xlabel('Principal Component 1')
-    plt.ylabel('Principal Component 2')
-    plt.title('PCA of Exam Score Data')
-    plt.show()
-
 def display_data_set(data):
     print(data.head())
     print("---------- ")
@@ -55,7 +31,6 @@ def display_scatter_plot(y_test, y_pred):
     plt.show()
 
 def display_pairplot(data, hue_field):
-    # Plot some features
     sns.pairplot(data, hue=hue_field)
     plt.show()
 
@@ -88,7 +63,7 @@ def scale_data(X_train, X_test):
     return [X_train_scaled, X_test_scaled]
 
 # Load the data from the CSV file
-data = pd.read_csv('../datasets/StudentPerformanceFactors.csv')
+data = pd.read_csv('./data/StudentPerformanceFactors.csv')
 
 convert_categories_to_numbers(data)
 
