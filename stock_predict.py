@@ -6,7 +6,7 @@ from sklearn.metrics import mean_squared_error
 import matplotlib.pyplot as plt
 
 # Load data
-data = pd.read_csv('./data/stock_prices.csv', parse_dates=['date'])
+data = pd.read_csv('./data/aapl.csv', parse_dates=['date'])
 
 # Filter for a specific ticker symbol (AAPL for example)
 def prepare_data(df, symbol):
