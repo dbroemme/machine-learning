@@ -167,5 +167,6 @@ generated/
 temp/
 scripts/
 share/
+etc/
 
 pyvenv.cfg

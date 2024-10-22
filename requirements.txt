@@ -8,3 +8,9 @@ seaborn
 graphviz
 keras
 lazypredict
+hmmlearn
+yellowbrick
+sentence-transformers
+tf-keras
+matplotlib
+adjustText
