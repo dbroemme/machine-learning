@@ -10,6 +10,75 @@ st.title("Interactive Neuron Visualization")
 
 st.write("Use the controls below to modify the neuron's inputs, weights, and bias. The visualization will update in real-time.")
 
+def create_2d_contribution_graph(weights, bias, activation_function):
+    x = np.linspace(-10, 10, 200)
+    fig = go.Figure()
+
+    colors = ['red', 'blue', 'green', 'purple', 'orange']
+
+    # Calculate individual contributions
+    contributions = []
+    for i, w in enumerate(weights):
+        y = x * w
+        contributions.append(y)
+        fig.add_trace(go.Scatter(
+            x=x, y=y,
+            mode='lines',
+            name=f'Input {i+1} Contribution',
+            line=dict(color=colors[i % len(colors)])
+        ))
+    
+    # Calculate total output with activation
+    total_input = np.array([sum(c[i] for c in contributions) + bias for i in range(len(x))])
+    neuron = Neuron(len(weights), activation_function)
+    neuron.set_weights(weights)
+    neuron.set_bias(bias)
+    
+    total_output = np.array([neuron.forward([xi] + [0]*(len(weights)-1)) for xi in x])
+    i = 0
+    print("Input       Total")
+    while i < 10:
+        print(total_input[i], total_input[i])
+        i = i + 1
+
+    fig.add_trace(go.Scatter(
+        x=x, y=total_output,
+        mode='lines',
+        name='Total Output (with activation)',
+        line=dict(color='white', width=2)
+    ))
+    
+    fig.add_trace(go.Scatter(
+        x=x, y=total_input,
+        mode='lines',
+        name='Weighted Sums',
+        line=dict(color='green', width=1)
+    ))
+    
+    #fig.update_layout(
+    #    title="Neuron Components and Output",
+    #    xaxis_title="Input Value",
+    #    yaxis_title="Output Value",
+    #    showlegend=True,
+    #    height=400
+    #)
+    fig.update_layout(
+        title="Neuron Components and Output",
+        xaxis_title="Input Value",
+        yaxis_title="Output Value",
+        showlegend=True,
+        height=400,
+        legend=dict(
+            orientation="h",  # Horizontal legend
+            yanchor="bottom",  # Anchor to the bottom of the graph
+            y=-1.0,  # Adjust placement below the graph
+            xanchor="center",  # Center the legend
+            x=0.5  # Set it at the center of the x-axis
+        )
+    )
+    
+    return fig
+
 def create_network_graph(layer_sizes, is_mlp=False):
     edges = []
     node_x = []
@@ -88,15 +157,15 @@ def create_3d_graph(X, Y, Z, title, uirevision_params):
 
 # Single Neuron Section
 st.header("Single Neuron")
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 
 with col1:
     st.subheader("Neuron Controls")
     num_inputs = st.slider("Number of Inputs", min_value=2, max_value=5, value=2, step=1)
-    inputs = [st.slider(f"Input {i+1}", min_value=-10.0, max_value=10.0, value=1.0, step=0.1) for i in range(num_inputs)]
     weights = [st.slider(f"Weight {i+1}", min_value=-10.0, max_value=10.0, value=1.0, step=0.1) for i in range(num_inputs)]
     bias = st.slider("Bias", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
     activation_function = st.selectbox("Activation Function", ["Sigmoid", "ReLU", "Tanh"])
+    inputs = [st.slider(f"Input {i+1}", min_value=-10.0, max_value=10.0, value=1.0, step=0.1) for i in range(num_inputs)]
 
     # Create neuron instance
     neuron = Neuron(num_inputs, activation_function)
@@ -108,6 +177,7 @@ with col1:
     # Calculate output
     output = neuron.forward(inputs)
 
+    st.write(f"Single Neuron Output: {output:.4f}")
 with col2:
 
     # Create 3D visualization for Single Neuron
@@ -130,8 +200,6 @@ with col2:
     }
     st.plotly_chart(create_3d_graph(X, Y, Z_neuron, "Single Neuron Output Surface", uirevision_params_neuron))
 
-    st.write(f"## Single Neuron Output: {output:.4f}")
-
     st.subheader("Test Single Neuron")
     input1 = st.number_input("Input 1", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
     input2 = st.number_input("Input 2", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
@@ -140,6 +208,11 @@ with col2:
         test_inputs = test_inputs[:neuron.num_inputs] + [0] * (neuron.num_inputs - len(test_inputs))
         test_output = neuron.forward(test_inputs)
         st.write(f"Neuron Output: {test_output:.4f}")
+
+with col3:
+    # Display 2D contribution graph
+    st.plotly_chart(create_2d_contribution_graph(weights, bias, activation_function))
+
 
 st.subheader("Neuron Output")
 # Display Single Neuron Structure

@@ -24,11 +24,14 @@ class Neuron:
     def _tanh(self, x):
         return np.tanh(x)
 
+    def get_weighted_sum(self, inputs):
+        return np.dot(self.weights, inputs) + self.bias
+    
     def forward(self, inputs):
         if len(inputs) != self.num_inputs:
             raise ValueError("Number of inputs must match number of weights")
         
-        weighted_sum = np.dot(self.weights, inputs) + self.bias
+        weighted_sum = self.get_weighted_sum(inputs)
         
         if self.activation_function == "Sigmoid":
             return self._sigmoid(weighted_sum)
