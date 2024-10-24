@@ -109,46 +109,43 @@ with col1:
     output = neuron.forward(inputs)
 
 with col2:
-    st.subheader("Neuron Output")
+
+    # Create 3D visualization for Single Neuron
+    x = np.linspace(-10, 10, 100)
+    y = np.linspace(-10, 10, 100)
+    X, Y = np.meshgrid(x, y)
+    Z_neuron = np.zeros_like(X)
+
+    for i in range(X.shape[0]):
+        for j in range(X.shape[1]):
+            viz_inputs = [X[i, j], Y[i, j]]
+            full_inputs = viz_inputs + inputs[2:]
+            full_inputs = full_inputs[:neuron.num_inputs] + [0] * (neuron.num_inputs - len(full_inputs))
+            Z_neuron[i, j] = neuron.forward(full_inputs)
+
+    uirevision_params_neuron = {
+        'weights': weights,
+        'bias': bias,
+        'activation': activation_function
+    }
+    st.plotly_chart(create_3d_graph(X, Y, Z_neuron, "Single Neuron Output Surface", uirevision_params_neuron))
+
     st.write(f"## Single Neuron Output: {output:.4f}")
-    
-    # Display Single Neuron Structure
-    st.plotly_chart(create_network_graph([num_inputs, 1]))
 
-# Create 3D visualization for Single Neuron
-x = np.linspace(-10, 10, 100)
-y = np.linspace(-10, 10, 100)
-X, Y = np.meshgrid(x, y)
-Z_neuron = np.zeros_like(X)
-
-for i in range(X.shape[0]):
-    for j in range(X.shape[1]):
-        viz_inputs = [X[i, j], Y[i, j]]
-        full_inputs = viz_inputs + inputs[2:]
-        full_inputs = full_inputs[:neuron.num_inputs] + [0] * (neuron.num_inputs - len(full_inputs))
-        Z_neuron[i, j] = neuron.forward(full_inputs)
-
-uirevision_params_neuron = {
-    'weights': weights,
-    'bias': bias,
-    'activation': activation_function
-}
-st.plotly_chart(create_3d_graph(X, Y, Z_neuron, "Single Neuron Output Surface", uirevision_params_neuron))
-
-# New section: Form for Single Neuron input
-st.subheader("Test Single Neuron")
-col1, col2 = st.columns(2)
-
-with col1:
+    st.subheader("Test Single Neuron")
     input1 = st.number_input("Input 1", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
     input2 = st.number_input("Input 2", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
-
-with col2:
     if st.button("Calculate Neuron Output"):
         test_inputs = [input1, input2] + inputs[2:]
         test_inputs = test_inputs[:neuron.num_inputs] + [0] * (neuron.num_inputs - len(test_inputs))
         test_output = neuron.forward(test_inputs)
         st.write(f"Neuron Output: {test_output:.4f}")
+
+st.subheader("Neuron Output")
+# Display Single Neuron Structure
+st.plotly_chart(create_network_graph([num_inputs, 1]))
+                    
+
 
 # Multi-Layer Perceptron (MLP) Section
 st.header("Multi-Layer Perceptron (MLP)")
