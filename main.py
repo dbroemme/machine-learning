@@ -10,9 +10,10 @@ st.title("Interactive Neuron Visualization")
 
 st.write("Use the controls below to modify the neuron's inputs, weights, and bias. The visualization will update in real-time.")
 
-def create_2d_contribution_graph(weights, bias, activation_function):
-    x = np.linspace(-10, 10, 200)
+def create_2d_contribution_graph(weights, bias, activation_function, is_fig2=False):
+    x = np.linspace(-5, 5, 200)
     fig = go.Figure()
+    fig2 = go.Figure()
 
     colors = ['red', 'blue', 'green', 'purple', 'orange']
 
@@ -35,13 +36,13 @@ def create_2d_contribution_graph(weights, bias, activation_function):
     neuron.set_bias(bias)
     
     total_output = np.array([neuron.forward([xi] + [0]*(len(weights)-1)) for xi in x])
-    i = 0
-    print("Input       Total")
-    while i < 10:
-        print(total_input[i], total_input[i])
-        i = i + 1
+    #i = 0
+    #print("Input       Total")
+    #while i < 5:
+    #    print(total_input[i], total_input[i])
+    #    i = i + 1
 
-    fig.add_trace(go.Scatter(
+    fig2.add_trace(go.Scatter(
         x=x, y=total_output,
         mode='lines',
         name='Total Output (with activation)',
@@ -55,13 +56,20 @@ def create_2d_contribution_graph(weights, bias, activation_function):
         line=dict(color='green', width=1)
     ))
     
-    #fig.update_layout(
-    #    title="Neuron Components and Output",
-    #    xaxis_title="Input Value",
-    #    yaxis_title="Output Value",
-    #    showlegend=True,
-    #    height=400
-    #)
+    fig2.update_layout(
+        title="Neuron Activation",
+        xaxis_title="Input Value",
+        yaxis_title="Output Value",
+        showlegend=True,
+        height=400,
+        legend=dict(
+            orientation="h",  # Horizontal legend
+            yanchor="bottom",  # Anchor to the bottom of the graph
+            y=-1.0,  # Adjust placement below the graph
+            xanchor="center",  # Center the legend
+            x=0.5  # Set it at the center of the x-axis
+        )
+    )
     fig.update_layout(
         title="Neuron Components and Output",
         xaxis_title="Input Value",
@@ -77,6 +85,9 @@ def create_2d_contribution_graph(weights, bias, activation_function):
         )
     )
     
+    #return [fig, fig2]
+    if is_fig2:
+        return fig2
     return fig
 
 def create_network_graph(layer_sizes, is_mlp=False):
@@ -162,10 +173,10 @@ col1, col2, col3 = st.columns(3)
 with col1:
     st.subheader("Neuron Controls")
     num_inputs = st.slider("Number of Inputs", min_value=2, max_value=5, value=2, step=1)
-    weights = [st.slider(f"Weight {i+1}", min_value=-10.0, max_value=10.0, value=1.0, step=0.1) for i in range(num_inputs)]
-    bias = st.slider("Bias", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
+    weights = [st.slider(f"Weight {i+1}", min_value=-5.0, max_value=5.0, value=1.0, step=0.1) for i in range(num_inputs)]
+    bias = st.slider("Bias", min_value=-5.0, max_value=5.0, value=0.0, step=0.1)
     activation_function = st.selectbox("Activation Function", ["Sigmoid", "ReLU", "Tanh"])
-    inputs = [st.slider(f"Input {i+1}", min_value=-10.0, max_value=10.0, value=1.0, step=0.1) for i in range(num_inputs)]
+    inputs = [st.slider(f"Input {i+1}", min_value=-5.0, max_value=5.0, value=1.0, step=0.1) for i in range(num_inputs)]
 
     # Create neuron instance
     neuron = Neuron(num_inputs, activation_function)
@@ -181,8 +192,8 @@ with col1:
 with col2:
 
     # Create 3D visualization for Single Neuron
-    x = np.linspace(-10, 10, 100)
-    y = np.linspace(-10, 10, 100)
+    x = np.linspace(-5, 5, 100)
+    y = np.linspace(-5, 5, 100)
     X, Y = np.meshgrid(x, y)
     Z_neuron = np.zeros_like(X)
 
@@ -201,8 +212,8 @@ with col2:
     st.plotly_chart(create_3d_graph(X, Y, Z_neuron, "Single Neuron Output Surface", uirevision_params_neuron))
 
     st.subheader("Test Single Neuron")
-    input1 = st.number_input("Input 1", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
-    input2 = st.number_input("Input 2", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
+    input1 = st.number_input("Input 1", min_value=-5.0, max_value=5.0, value=0.0, step=0.1)
+    input2 = st.number_input("Input 2", min_value=-4.0, max_value=5.0, value=0.0, step=0.1)
     if st.button("Calculate Neuron Output"):
         test_inputs = [input1, input2] + inputs[2:]
         test_inputs = test_inputs[:neuron.num_inputs] + [0] * (neuron.num_inputs - len(test_inputs))
@@ -211,7 +222,11 @@ with col2:
 
 with col3:
     # Display 2D contribution graph
-    st.plotly_chart(create_2d_contribution_graph(weights, bias, activation_function))
+    #fig1, fig2 = st.plotly_chart(create_2d_contribution_graph(weights, bias, activation_function))
+    fig1 = create_2d_contribution_graph(weights, bias, activation_function)
+    st.plotly_chart(fig1, use_container_width=True)
+    fig2 = create_2d_contribution_graph(weights, bias, activation_function, True)
+    st.plotly_chart(fig2, use_container_width=True)
 
 
 st.subheader("Neuron Output")
