@@ -406,6 +406,40 @@ st.pyplot(fig)
 # Clear the matplotlib figure to free up memory
 plt.clf()
 
+# After the network structure visualization, add this new section:
+
+st.subheader("Neural Network Input-Output Relationship")
+
+# Create input data
+x = np.linspace(-10, 10, 200)
+
+# Get predictions
+y = np.array([nn.predict([xi]) for xi in x])
+
+# Create the plot
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.plot(x, y, 'b-', linewidth=2)
+ax.set_xlabel('Input', fontsize=12)
+ax.set_ylabel('Output', fontsize=12)
+ax.set_title('Neural Network Input-Output Relationship', fontsize=14)
+ax.grid(True, linestyle='--', alpha=0.7)
+
+# Add reference lines
+ax.axhline(y=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
+ax.axvline(x=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
+
+# Set axis limits
+ax.set_xlim(-10, 10)
+y_min, y_max = y.min(), y.max()
+y_range = y_max - y_min
+ax.set_ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
+
+# Display the plot in Streamlit
+st.pyplot(fig)
+
+# Clear the matplotlib figure to free up memory
+plt.clf()
+
 st.write("## How it works")
 st.write("""
 1. Adjust the number of inputs, input values, weights, and bias using the sliders above for both the single neuron and the MLP.
@@ -427,4 +461,5 @@ st.write("- w_i are the weights")
 st.write("- x_i are the inputs")
 st.write("- b is the bias")
 st.write("- Subscripts 1, 2, 3 represent layers in the MLP")
+
 
