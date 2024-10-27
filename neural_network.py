@@ -1,6 +1,9 @@
 import numpy as np
 from neuron import Neuron
 
+# Set the random seed for NumPy
+np.random.seed(42)  # You can choose any integer value
+
 class SimpleNeuralNetwork:
     def __init__(self, input_size, hidden_size, output_size):
         self.hidden_layer = [Neuron(input_size, "ReLU") for _ in range(hidden_size)]
