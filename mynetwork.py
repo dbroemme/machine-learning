@@ -28,26 +28,6 @@ def create_3d_graph(X, Y, Z, title, uirevision_params):
     )
     return fig
 
-
-# Add a section for the neural network
-st.header("Simple Neural Network")
-
-# Create a SimpleNeuralNetwork instance
-nn = SimpleNeuralNetwork(input_size=1, hidden_size=3, output_size=1, use_standard_scalar=True)
-X = np.array([[-1], [0], [1], [2], [3], [4]])
-y = np.array([4, 3, 2, 1, 0, -1])
-nn.train(X, y, epochs=10000, learning_rate=0.1)
-
-# Add a slider for the input
-nn_input = st.slider("Input Value", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
-
-# Make a prediction
-nn_output = nn.predict([nn_input])
-
-# Display the prediction
-st.write(f"Neural Network Output: {nn_output[0]:.4f}")
-
-
 # Create a function to draw the network
 def draw_neural_network(nn):
     G = nx.DiGraph()
@@ -106,7 +86,7 @@ def draw_neural_network(nn):
     return plt
 
 # Add this new section for the data input table
-st.header("Neural Network Training Data")
+st.header("Training Data")
 
 # Create a default dataframe
 default_data = pd.DataFrame({
@@ -137,9 +117,11 @@ if st.button("Train Neural Network"):
 # Check if we have a trained network
 if 'nn' in st.session_state:
     nn = st.session_state.nn
-    
+
+
     # Add a slider for the input
-    nn_input = st.slider("Neural Network Input", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
+    nn_input = st.slider("Neural Network Input", min_value=-5.0, max_value=5.0, value=0.0, step=0.1)
+
 
     # Make a prediction
     nn_output = nn.predict([nn_input])
@@ -162,40 +144,40 @@ if 'nn' in st.session_state:
     #}
     #st.plotly_chart(create_3d_graph(X, Y, Z_nn, "Neural Network Output Surface", uirevision_params_nn))
 
-    st.subheader("Neural Network Input-Output Relationship")
-    # Create input data
-    x = np.linspace(-10, 10, 200)
-    # Get predictions
-    y = np.array([nn.predict([xi]) for xi in x])
-    # Create the plot
-    fig, ax = plt.subplots(figsize=(8, 4))
-    ax.plot(x, y, 'b-', linewidth=2)
-    ax.set_xlabel('Input', fontsize=12)
-    ax.set_ylabel('Output', fontsize=12)
-    ax.set_title('Neural Network Input-Output Relationship', fontsize=14)
-    ax.grid(True, linestyle='--', alpha=0.7)
-    # Add reference lines
-    ax.axhline(y=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
-    ax.axvline(x=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
-    # Set axis limits
-    ax.set_xlim(-10, 10)
-    y_min, y_max = y.min(), y.max()
-    y_range = y_max - y_min
-    ax.set_ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
-    
-    # Display the plot in Streamlit
-    st.plotly_chart(fig)
-    # Clear the matplotlib figure to free up memory
-    plt.clf()
+    col1, col2 = st.columns([1, 1])
+    with col1:
+        st.subheader("Neural Network Input-Output Relationship")
+        # Create input data
+        x = np.linspace(-10, 10, 200)
+        # Get predictions
+        y = np.array([nn.predict([xi]) for xi in x])
+        # Create the plot
+        fig, ax = plt.subplots(figsize=(8, 4))
+        ax.plot(x, y, 'b-', linewidth=2)
+        ax.set_xlabel('Input', fontsize=12)
+        ax.set_ylabel('Output', fontsize=12)
+        ax.set_title('Neural Network Input-Output Relationship', fontsize=14)
+        ax.grid(True, linestyle='--', alpha=0.7)
+        # Add reference lines
+        ax.axhline(y=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
+        ax.axvline(x=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
+        # Set axis limits
+        ax.set_xlim(-10, 10)
+        y_min, y_max = y.min(), y.max()
+        y_range = y_max - y_min
+        ax.set_ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
+        
+        # Display the plot in Streamlit
+        st.plotly_chart(fig)
+        # Clear the matplotlib figure to free up memory
+        plt.clf()
 
-
-
-
-    # Visualize the neural network structure
-    st.subheader("Neural Network Structure")
-    fig = draw_neural_network(nn)
-    st.pyplot(fig)
-    plt.clf()
+    with col2:
+        # Visualize the neural network structure
+        st.subheader("Neural Network Structure")
+        fig = draw_neural_network(nn)
+        st.pyplot(fig)
+        plt.clf()
 
 else:
     st.info("Please train the neural network using the data table above.")
