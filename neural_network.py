@@ -6,6 +6,7 @@ np.random.seed(42)  # You can choose any integer value
 
 class SimpleNeuralNetwork:
     def __init__(self, input_size, hidden_size, output_size):
+        print("Creating a new simple nn")
         self.hidden_layer = [Neuron(input_size, "ReLU") for _ in range(hidden_size)]
         self.output_neuron = Neuron(hidden_size, "Sigmoid")
 

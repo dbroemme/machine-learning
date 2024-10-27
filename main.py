@@ -2,7 +2,6 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 from neuron import Neuron
-from mlp import create_mlp_with_random_params, MLP
 from neural_network import SimpleNeuralNetwork
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -39,11 +38,11 @@ def create_2d_contribution_graph(weights, bias, activation_function, is_fig2=Fal
     
     #total_output = np.array([neuron.forward([xi] + [0]*(len(weights)-1)) for xi in x])
     total_output = np.array([neuron._sigmoid(ti) for ti in total_input])
-    i = 0
-    print("Input       Total")
-    while i < 5:
-        print(total_input[i], total_output[i])
-        i = i + 1
+    #i = 0
+    #print("Input       Total")
+    #while i < 5:
+    #    print(total_input[i], total_output[i])
+    #    i = i + 1
 
     if is_fig2:
         fig.add_trace(go.Scatter(
@@ -327,6 +326,9 @@ st.header("Simple Neural Network")
 
 # Create a SimpleNeuralNetwork instance
 nn = SimpleNeuralNetwork(input_size=1, hidden_size=3, output_size=1)
+X = np.array([[-1], [0], [1], [2]])
+y = np.array([0, 1, 2, 3])
+nn.train(X, y, epochs=10000, learning_rate=0.1)
 
 # Add a slider for the input
 nn_input = st.slider("Neural Network Input", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
@@ -337,8 +339,6 @@ nn_output = nn.predict([nn_input])
 # Display the prediction
 st.write(f"Neural Network Output: {nn_output:.4f}")
 
-# Visualize the neural network structure
-st.subheader("Neural Network Structure")
 
 # Create a function to draw the network
 def draw_neural_network(nn):
@@ -397,37 +397,21 @@ def draw_neural_network(nn):
     plt.axis('off')
     return plt
 
-# Draw the network
-fig = draw_neural_network(nn)
-
-# Display the plot in Streamlit
-st.pyplot(fig)
-
-# Clear the matplotlib figure to free up memory
-plt.clf()
-
-# After the network structure visualization, add this new section:
-
 st.subheader("Neural Network Input-Output Relationship")
-
 # Create input data
 x = np.linspace(-10, 10, 200)
-
 # Get predictions
 y = np.array([nn.predict([xi]) for xi in x])
-
 # Create the plot
-fig, ax = plt.subplots(figsize=(10, 6))
+fig, ax = plt.subplots(figsize=(8, 4))
 ax.plot(x, y, 'b-', linewidth=2)
 ax.set_xlabel('Input', fontsize=12)
 ax.set_ylabel('Output', fontsize=12)
 ax.set_title('Neural Network Input-Output Relationship', fontsize=14)
 ax.grid(True, linestyle='--', alpha=0.7)
-
 # Add reference lines
 ax.axhline(y=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
 ax.axvline(x=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
-
 # Set axis limits
 ax.set_xlim(-10, 10)
 y_min, y_max = y.min(), y.max()
@@ -435,10 +419,21 @@ y_range = y_max - y_min
 ax.set_ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
 
 # Display the plot in Streamlit
-st.pyplot(fig)
-
+#st.pyplot(fig)
+st.plotly_chart(fig)
 # Clear the matplotlib figure to free up memory
 plt.clf()
+
+
+
+# Visualize the neural network structure
+st.subheader("Neural Network Structure")
+fig = draw_neural_network(nn)
+st.pyplot(fig)
+plt.clf()
+
+
+
 
 st.write("## How it works")
 st.write("""
