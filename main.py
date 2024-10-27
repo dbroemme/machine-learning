@@ -325,9 +325,9 @@ with col3:
 st.header("Simple Neural Network")
 
 # Create a SimpleNeuralNetwork instance
-nn = SimpleNeuralNetwork(input_size=1, hidden_size=3, output_size=1)
+nn = SimpleNeuralNetwork(input_size=1, hidden_size=3, output_size=1, use_standard_scalar=True)
 X = np.array([[-1], [0], [1], [2], [3], [4]])
-y = np.array([0, 1, 2, 3, 4, 5])
+y = np.array([4, 3, 2, 1, 0, -1])
 nn.train(X, y, epochs=10000, learning_rate=0.1)
 
 # Add a slider for the input
@@ -337,7 +337,7 @@ nn_input = st.slider("Neural Network Input", min_value=-10.0, max_value=10.0, va
 nn_output = nn.predict([nn_input])
 
 # Display the prediction
-st.write(f"Neural Network Output: {nn_output:.4f}")
+st.write(f"Neural Network Output: {nn_output[0]:.4f}")
 
 
 # Create a function to draw the network
@@ -423,8 +423,6 @@ ax.set_ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
 st.plotly_chart(fig)
 # Clear the matplotlib figure to free up memory
 plt.clf()
-
-
 
 # Visualize the neural network structure
 st.subheader("Neural Network Structure")
