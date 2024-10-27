@@ -326,8 +326,8 @@ st.header("Simple Neural Network")
 
 # Create a SimpleNeuralNetwork instance
 nn = SimpleNeuralNetwork(input_size=1, hidden_size=3, output_size=1)
-X = np.array([[-1], [0], [1], [2]])
-y = np.array([0, 1, 2, 3])
+X = np.array([[-1], [0], [1], [2], [3], [4]])
+y = np.array([0, 1, 2, 3, 4, 5])
 nn.train(X, y, epochs=10000, learning_rate=0.1)
 
 # Add a slider for the input

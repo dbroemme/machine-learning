@@ -9,13 +9,31 @@ class SimpleNeuralNetwork:
         print("Creating a new simple nn")
         self.hidden_layer = [Neuron(input_size, "ReLU") for _ in range(hidden_size)]
         self.output_neuron = Neuron(hidden_size, "Sigmoid")
+        self.input_min = None
+        self.input_max = None
+        self.output_min = None
+        self.output_max = None
+
+    def scale_input(self, input_data):
+        return (input_data - self.input_min) / (self.input_max - self.input_min)
+
+    def descale_output(self, output):
+        return output * (self.output_max - self.output_min) + self.output_min
+
+    def fit_scaler(self, X, y):
+        self.input_min = np.min(X, axis=0)
+        self.input_max = np.max(X, axis=0)
+        self.output_min = np.min(y)
+        self.output_max = np.max(y)
 
     def forward(self, input_data):
-        self.hidden_outputs = [neuron.forward(input_data) for neuron in self.hidden_layer]
+        scaled_input = self.scale_input(input_data)
+        self.hidden_outputs = [neuron.forward(scaled_input) for neuron in self.hidden_layer]
         return self.output_neuron.forward(self.hidden_outputs)
 
     def predict(self, input_data):
-        return self.forward(input_data)
+        output = self.forward(input_data)
+        return self.descale_output(output)
 
     def backward(self, input_data, target, learning_rate):
         # Forward pass
@@ -40,9 +58,12 @@ class SimpleNeuralNetwork:
             hidden_neuron.bias += learning_rate * hidden_delta
 
     def train(self, X, y, epochs, learning_rate):
+        self.fit_scaler(X, y)
+        scaled_y = (y - self.output_min) / (self.output_max - self.output_min)
+
         for epoch in range(epochs):
             total_loss = 0
-            for input_data, target in zip(X, y):
+            for input_data, target in zip(X, scaled_y):
                 output = self.forward(input_data)
                 loss = 0.5 * (target - output) ** 2
                 total_loss += loss
