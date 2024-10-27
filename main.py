@@ -4,6 +4,8 @@ import plotly.graph_objects as go
 from neuron import Neuron
 from mlp import create_mlp_with_random_params, MLP
 from neural_network import SimpleNeuralNetwork
+import networkx as nx
+import matplotlib.pyplot as plt
 
 st.set_page_config(page_title="Interactive Neuron Visualization", layout="wide")
 
@@ -337,18 +339,72 @@ st.write(f"Neural Network Output: {nn_output:.4f}")
 
 # Visualize the neural network structure
 st.subheader("Neural Network Structure")
-st.write("Input Layer (1 neuron) -> Hidden Layer (3 neurons) -> Output Layer (1 neuron)")
 
-# Display weights and biases
-st.subheader("Weights and Biases")
-for i, neuron in enumerate(nn.hidden_layer):
-    st.write(f"Hidden Neuron {i+1}:")
-    st.write(f"  Weights: {neuron.weights}")
-    st.write(f"  Bias: {neuron.bias}")
+# Create a function to draw the network
+def draw_neural_network(nn):
+    G = nx.DiGraph()
+    pos = {}
+    node_colors = []
+    node_sizes = []
+    edge_labels = {}
 
-st.write("Output Neuron:")
-st.write(f"  Weights: {nn.output_neuron.weights}")
-st.write(f"  Bias: {nn.output_neuron.bias}")
+    # Input layer
+    G.add_node("I1")
+    pos["I1"] = (0, 0)
+    node_colors.append('lightblue')
+    node_sizes.append(1000)
+
+    # Hidden layer
+    for i in range(3):
+        node = f"H{i+1}"
+        G.add_node(node)
+        pos[node] = (1, i - 1)
+        node_colors.append('lightgreen')
+        node_sizes.append(1000)
+        weight = nn.hidden_layer[i].weights[0]
+        G.add_edge("I1", node)
+        edge_labels[("I1", node)] = f"{weight:.2f}"
+
+    # Output layer
+    G.add_node("O1")
+    pos["O1"] = (2, 0)
+    node_colors.append('salmon')
+    node_sizes.append(1000)
+
+    for i in range(3):
+        weight = nn.output_neuron.weights[i]
+        G.add_edge(f"H{i+1}", "O1")
+        edge_labels[(f"H{i+1}", "O1")] = f"{weight:.2f}"
+
+    # Create the plot
+    plt.figure(figsize=(10, 6))
+    nx.draw(G, pos, node_color=node_colors, node_size=node_sizes, with_labels=True, 
+            font_size=10, font_weight='bold', arrows=True, arrowsize=20)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=8)
+
+    # Add bias annotations
+    for i, node in enumerate(["I1", "H1", "H2", "H3", "O1"]):
+        if node == "I1":
+            bias = 0
+        elif node == "O1":
+            bias = nn.output_neuron.bias
+        else:
+            bias = nn.hidden_layer[i-1].bias
+        plt.annotate(f"b: {bias:.2f}", xy=pos[node], xytext=(5, 5), 
+                     textcoords="offset points", fontsize=8)
+
+    plt.title("Neural Network Structure with Weights and Biases")
+    plt.axis('off')
+    return plt
+
+# Draw the network
+fig = draw_neural_network(nn)
+
+# Display the plot in Streamlit
+st.pyplot(fig)
+
+# Clear the matplotlib figure to free up memory
+plt.clf()
 
 st.write("## How it works")
 st.write("""
@@ -371,3 +427,4 @@ st.write("- w_i are the weights")
 st.write("- x_i are the inputs")
 st.write("- b is the bias")
 st.write("- Subscripts 1, 2, 3 represent layers in the MLP")
+
