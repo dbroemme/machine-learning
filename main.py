@@ -13,8 +13,6 @@ st.write("Use the controls below to modify the neuron's inputs, weights, and bia
 def create_2d_contribution_graph(weights, bias, activation_function, is_fig2=False):
     x = np.linspace(-5, 5, 200)
     fig = go.Figure()
-    fig2 = go.Figure()
-
     colors = ['red', 'blue', 'green', 'purple', 'orange']
 
     # Calculate individual contributions
@@ -22,12 +20,13 @@ def create_2d_contribution_graph(weights, bias, activation_function, is_fig2=Fal
     for i, w in enumerate(weights):
         y = x * w
         contributions.append(y)
-        fig.add_trace(go.Scatter(
-            x=x, y=y,
-            mode='lines',
-            name=f'Input {i+1} Contribution',
-            line=dict(color=colors[i % len(colors)])
-        ))
+        if not is_fig2:
+            fig.add_trace(go.Scatter(
+                x=x, y=y,
+                mode='lines',
+                name=f'Input {i+1} Contribution',
+                line=dict(color=colors[i % len(colors)])
+            ))
     
     # Calculate total output with activation
     total_input = np.array([sum(c[i] for c in contributions) + bias for i in range(len(x))])
@@ -35,59 +34,60 @@ def create_2d_contribution_graph(weights, bias, activation_function, is_fig2=Fal
     neuron.set_weights(weights)
     neuron.set_bias(bias)
     
-    total_output = np.array([neuron.forward([xi] + [0]*(len(weights)-1)) for xi in x])
-    #i = 0
-    #print("Input       Total")
-    #while i < 5:
-    #    print(total_input[i], total_input[i])
-    #    i = i + 1
+    #total_output = np.array([neuron.forward([xi] + [0]*(len(weights)-1)) for xi in x])
+    total_output = np.array([neuron._sigmoid(ti) for ti in total_input])
+    i = 0
+    print("Input       Total")
+    while i < 5:
+        print(total_input[i], total_output[i])
+        i = i + 1
 
-    fig2.add_trace(go.Scatter(
-        x=x, y=total_output,
-        mode='lines',
-        name='Total Output (with activation)',
-        line=dict(color='white', width=2)
-    ))
-    
-    fig.add_trace(go.Scatter(
-        x=x, y=total_input,
-        mode='lines',
-        name='Weighted Sums',
-        line=dict(color='green', width=1)
-    ))
-    
-    fig2.update_layout(
-        title="Neuron Activation",
-        xaxis_title="Input Value",
-        yaxis_title="Output Value",
-        showlegend=True,
-        height=400,
-        legend=dict(
-            orientation="h",  # Horizontal legend
-            yanchor="bottom",  # Anchor to the bottom of the graph
-            y=-1.0,  # Adjust placement below the graph
-            xanchor="center",  # Center the legend
-            x=0.5  # Set it at the center of the x-axis
-        )
-    )
-    fig.update_layout(
-        title="Neuron Components and Output",
-        xaxis_title="Input Value",
-        yaxis_title="Output Value",
-        showlegend=True,
-        height=400,
-        legend=dict(
-            orientation="h",  # Horizontal legend
-            yanchor="bottom",  # Anchor to the bottom of the graph
-            y=-1.0,  # Adjust placement below the graph
-            xanchor="center",  # Center the legend
-            x=0.5  # Set it at the center of the x-axis
-        )
-    )
-    
-    #return [fig, fig2]
     if is_fig2:
-        return fig2
+        fig.add_trace(go.Scatter(
+            x=x, y=total_output,
+            mode='lines',
+            name='Total Output (with activation)',
+            line=dict(color='white', width=2)
+        ))
+    else:
+        fig.add_trace(go.Scatter(
+            x=x, y=total_input,
+            mode='lines',
+            name='Weighted Sums',
+            line=dict(color='white', width=2)
+        ))
+    
+    if is_fig2:
+        fig.update_layout(
+            title="Neuron Activation",
+            xaxis_title="Input Value",
+            yaxis_title="Output Value",
+            showlegend=True,
+            height=400,
+            legend=dict(
+                orientation="h",  # Horizontal legend
+                yanchor="bottom",  # Anchor to the bottom of the graph
+                y=-1.0,  # Adjust placement below the graph
+                xanchor="center",  # Center the legend
+                x=0.5  # Set it at the center of the x-axis
+            )
+        )
+    else:
+        fig.update_layout(
+            title="Neuron Components and Output",
+            xaxis_title="Input Value",
+            yaxis_title="Output Value",
+            showlegend=True,
+            height=400,
+            legend=dict(
+                orientation="h",  # Horizontal legend
+                yanchor="bottom",  # Anchor to the bottom of the graph
+                y=-1.0,  # Adjust placement below the graph
+                xanchor="center",  # Center the legend
+                x=0.5  # Set it at the center of the x-axis
+            )
+        )
+    
     return fig
 
 def create_network_graph(layer_sizes, is_mlp=False):
@@ -168,12 +168,12 @@ def create_3d_graph(X, Y, Z, title, uirevision_params):
 
 # Single Neuron Section
 st.header("Single Neuron")
-col1, col2, col3 = st.columns(3)
+col1, col2, col3 = st.columns([1, 2, 2])
 
 with col1:
     st.subheader("Neuron Controls")
     num_inputs = st.slider("Number of Inputs", min_value=2, max_value=5, value=2, step=1)
-    weights = [st.slider(f"Weight {i+1}", min_value=-5.0, max_value=5.0, value=1.0, step=0.1) for i in range(num_inputs)]
+    weights = [st.slider(f"Weight {i+1}", min_value=-2.0, max_value=2.0, value=1.0, step=0.1) for i in range(num_inputs)]
     bias = st.slider("Bias", min_value=-5.0, max_value=5.0, value=0.0, step=0.1)
     activation_function = st.selectbox("Activation Function", ["Sigmoid", "ReLU", "Tanh"])
     inputs = [st.slider(f"Input {i+1}", min_value=-5.0, max_value=5.0, value=1.0, step=0.1) for i in range(num_inputs)]
@@ -221,12 +221,25 @@ with col2:
         st.write(f"Neuron Output: {test_output:.4f}")
 
 with col3:
-    # Display 2D contribution graph
-    #fig1, fig2 = st.plotly_chart(create_2d_contribution_graph(weights, bias, activation_function))
-    fig1 = create_2d_contribution_graph(weights, bias, activation_function)
-    st.plotly_chart(fig1, use_container_width=True)
-    fig2 = create_2d_contribution_graph(weights, bias, activation_function, True)
-    st.plotly_chart(fig2, use_container_width=True)
+    # Create placeholders for the graphs
+    graph_placeholder1 = st.empty()
+    graph_placeholder2 = st.empty()
+
+    # Function to update graphs
+    def update_graphs():
+        fig1 = create_2d_contribution_graph(weights, bias, activation_function)
+        graph_placeholder1.plotly_chart(fig1, use_container_width=True)
+        
+        fig2 = create_2d_contribution_graph(weights, bias, activation_function, True)
+        graph_placeholder2.plotly_chart(fig2, use_container_width=True)
+
+    # Initial graph drawing
+    update_graphs()
+
+    # Add a callback to update graphs when inputs change
+    #for w in weights:
+    #    w.on_change(lambda _: update_graphs())
+    #bias.on_change(lambda _: update_graphs())
 
 
 st.subheader("Neuron Output")
