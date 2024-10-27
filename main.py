@@ -3,6 +3,7 @@ import numpy as np
 import plotly.graph_objects as go
 from neuron import Neuron
 from mlp import create_mlp_with_random_params, MLP
+from neural_network import SimpleNeuralNetwork
 
 st.set_page_config(page_title="Interactive Neuron Visualization", layout="wide")
 
@@ -242,80 +243,112 @@ with col3:
     #bias.on_change(lambda _: update_graphs())
 
 
-st.subheader("Neuron Output")
+#st.subheader("Neuron Output")
 # Display Single Neuron Structure
-st.plotly_chart(create_network_graph([num_inputs, 1]))
+#st.plotly_chart(create_network_graph([num_inputs, 1]))
                     
 
-
+################
+# Original MLP
+#
 # Multi-Layer Perceptron (MLP) Section
-st.header("Multi-Layer Perceptron (MLP)")
+#st.header("Multi-Layer Perceptron (MLP)")
 
 # Create MLP instance
-mlp_layer_sizes = [num_inputs, 3, 1]
-mlp = create_mlp_with_random_params(mlp_layer_sizes, activation_function)
+#mlp_layer_sizes = [num_inputs, 3, 1]
+#mlp = create_mlp_with_random_params(mlp_layer_sizes, activation_function)
 
-st.subheader("MLP Controls")
-mlp_weights = []
-mlp_biases = []
+#st.subheader("MLP Controls")
+#mlp_weights = []
+#mlp_biases = []
 
-for i, layer in enumerate(mlp.layers):
-    st.write(f"Layer {i+1}")
-    layer_weights = []
-    layer_biases = []
-    for j, neuron in enumerate(layer):
-        col1, col2 = st.columns(2)
-        with col1:
-            neuron_weights = [st.slider(f"L{i+1}N{j+1} Weight {k+1}", min_value=-10.0, max_value=10.0, value=float(w), step=0.1) for k, w in enumerate(neuron.weights)]
-        with col2:
-            neuron_bias = st.slider(f"L{i+1}N{j+1} Bias", min_value=-10.0, max_value=10.0, value=float(neuron.bias), step=0.1)
-        layer_weights.append(neuron_weights)
-        layer_biases.append(neuron_bias)
-    mlp_weights.append(layer_weights)
-    mlp_biases.append(layer_biases)
+#for i, layer in enumerate(mlp.layers):
+#    st.write(f"Layer {i+1}")
+#    layer_weights = []
+#    layer_biases = []
+#    for j, neuron in enumerate(layer):
+#        col1, col2 = st.columns(2)
+#        with col1:
+#            neuron_weights = [st.slider(f"L{i+1}N{j+1} Weight {k+1}", min_value=-10.0, max_value=10.0, value=float(w), step=0.1) for k, w in enumerate(neuron.weights)]
+#        with col2:
+#            neuron_bias = st.slider(f"L{i+1}N{j+1} Bias", min_value=-10.0, max_value=10.0, value=float(neuron.bias), step=0.1)
+#        layer_weights.append(neuron_weights)
+#        layer_biases.append(neuron_bias)
+#    mlp_weights.append(layer_weights)
+#    mlp_biases.append(layer_biases)
 
 # Set MLP weights and biases
-mlp.set_weights_and_biases(mlp_weights, mlp_biases)
+#mlp.set_weights_and_biases(mlp_weights, mlp_biases)
 
 # Calculate MLP output
-mlp_output = mlp.forward(inputs)
+#mlp_output = mlp.forward(inputs)
 
-st.write(f"## Multi-Layer Perceptron Output: {mlp_output:.4f}")
+#st.write(f"## Multi-Layer Perceptron Output: {mlp_output:.4f}")
 
 # Display MLP Structure
-st.plotly_chart(create_network_graph(mlp_layer_sizes, is_mlp=True))
+#st.plotly_chart(create_network_graph(mlp_layer_sizes, is_mlp=True))
 
 # Create 3D visualization for MLP
-Z_mlp = np.zeros_like(X)
+#Z_mlp = np.zeros_like(X)
 
-for i in range(X.shape[0]):
-    for j in range(X.shape[1]):
-        viz_inputs = [X[i, j], Y[i, j]]
-        full_inputs = viz_inputs + inputs[2:]
-        full_inputs = full_inputs[:mlp.layers[0][0].num_inputs] + [0] * (mlp.layers[0][0].num_inputs - len(full_inputs))
-        Z_mlp[i, j] = mlp.forward(full_inputs)
+#for i in range(X.shape[0]):
+#    for j in range(X.shape[1]):
+#        viz_inputs = [X[i, j], Y[i, j]]
+#        full_inputs = viz_inputs + inputs[2:]
+#        full_inputs = full_inputs[:mlp.layers[0][0].num_inputs] + [0] * (mlp.layers[0][0].num_inputs - len(full_inputs))
+#        Z_mlp[i, j] = mlp.forward(full_inputs)
 
-uirevision_params_mlp = {
-    'weights': mlp_weights,
-    'biases': mlp_biases,
-    'activation': activation_function
-}
-st.plotly_chart(create_3d_graph(X, Y, Z_mlp, "MLP Output Surface", uirevision_params_mlp))
+#uirevision_params_mlp = {
+#    'weights': mlp_weights,
+#    'biases': mlp_biases,
+#    'activation': activation_function
+#}
+#st.plotly_chart(create_3d_graph(X, Y, Z_mlp, "MLP Output Surface", uirevision_params_mlp))
 
 # New section: Form for MLP input
-st.subheader("Test Multi-Layer Perceptron")
-col1, col2 = st.columns(2)
+#st.subheader("Test Multi-Layer Perceptron")
+#col1, col2 = st.columns(2)
 
-with col1:
-    mlp_input1 = st.number_input("MLP Input 1", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
-    mlp_input2 = st.number_input("MLP Input 2", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
+#with col1:
+#    mlp_input1 = st.number_input("MLP Input 1", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
+#    mlp_input2 = st.number_input("MLP Input 2", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
 
-with col2:
-    if st.button("Calculate MLP Output"):
-        mlp_test_inputs = [mlp_input1, mlp_input2] + inputs[2:]
-        mlp_test_inputs = mlp_test_inputs[:mlp.layers[0][0].num_inputs] + [0] * (mlp.layers[0][0].num_inputs - len(mlp_test_inputs))
-        mlp_test_output = mlp.forward(mlp_test_inputs)
-        st.write(f"MLP Output: {mlp_test_output:.4f}")
+#with col2:
+#    if st.button("Calculate MLP Output"):
+#        mlp_test_inputs = [mlp_input1, mlp_input2] + inputs[2:]
+#        mlp_test_inputs = mlp_test_inputs[:mlp.layers[0][0].num_inputs] + [0] * (mlp.layers[0][0].num_inputs - len(mlp_test_inputs))
+#        mlp_test_output = mlp.forward(mlp_test_inputs)
+#        st.write(f"MLP Output: {mlp_test_output:.4f}")
+
+# Add a section for the neural network
+st.header("Simple Neural Network")
+
+# Create a SimpleNeuralNetwork instance
+nn = SimpleNeuralNetwork(input_size=1, hidden_size=3, output_size=1)
+
+# Add a slider for the input
+nn_input = st.slider("Neural Network Input", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
+
+# Make a prediction
+nn_output = nn.predict([nn_input])
+
+# Display the prediction
+st.write(f"Neural Network Output: {nn_output:.4f}")
+
+# Visualize the neural network structure
+st.subheader("Neural Network Structure")
+st.write("Input Layer (1 neuron) -> Hidden Layer (3 neurons) -> Output Layer (1 neuron)")
+
+# Display weights and biases
+st.subheader("Weights and Biases")
+for i, neuron in enumerate(nn.hidden_layer):
+    st.write(f"Hidden Neuron {i+1}:")
+    st.write(f"  Weights: {neuron.weights}")
+    st.write(f"  Bias: {neuron.bias}")
+
+st.write("Output Neuron:")
+st.write(f"  Weights: {nn.output_neuron.weights}")
+st.write(f"  Bias: {nn.output_neuron.bias}")
 
 st.write("## How it works")
 st.write("""
