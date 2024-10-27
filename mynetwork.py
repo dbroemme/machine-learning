@@ -68,7 +68,7 @@ def draw_neural_network(nn):
     plt.figure(figsize=(10, 6))
     nx.draw(G, pos, node_color=node_colors, node_size=node_sizes, with_labels=True, 
             font_size=10, font_weight='bold', arrows=True, arrowsize=20)
-    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=8)
+    nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=12)
 
     # Add bias annotations
     for i, node in enumerate(["I1", "H1", "H2", "H3", "O1"]):
@@ -78,8 +78,8 @@ def draw_neural_network(nn):
             bias = nn.output_neuron.bias
         else:
             bias = nn.hidden_layer[i-1].bias
-        plt.annotate(f"b: {bias:.2f}", xy=pos[node], xytext=(5, 5), 
-                     textcoords="offset points", fontsize=8)
+        plt.annotate(f"b: {bias:.2f}", xy=pos[node], xytext=(15, 5), 
+                     textcoords="offset points", fontsize=12)
 
     plt.title("Neural Network Structure with Weights and Biases")
     plt.axis('off')
