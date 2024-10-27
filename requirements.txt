@@ -15,3 +15,5 @@ tf-keras
 matplotlib
 adjustText
 streamlit
+plotly
+networkx

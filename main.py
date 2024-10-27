@@ -2,9 +2,9 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 from neuron import Neuron
-from neural_network import SimpleNeuralNetwork
 import networkx as nx
 import matplotlib.pyplot as plt
+import pandas as pd
 
 st.set_page_config(page_title="Interactive Neuron Visualization", layout="wide")
 
@@ -249,95 +249,6 @@ with col3:
 #st.plotly_chart(create_network_graph([num_inputs, 1]))
                     
 
-################
-# Original MLP
-#
-# Multi-Layer Perceptron (MLP) Section
-#st.header("Multi-Layer Perceptron (MLP)")
-
-# Create MLP instance
-#mlp_layer_sizes = [num_inputs, 3, 1]
-#mlp = create_mlp_with_random_params(mlp_layer_sizes, activation_function)
-
-#st.subheader("MLP Controls")
-#mlp_weights = []
-#mlp_biases = []
-
-#for i, layer in enumerate(mlp.layers):
-#    st.write(f"Layer {i+1}")
-#    layer_weights = []
-#    layer_biases = []
-#    for j, neuron in enumerate(layer):
-#        col1, col2 = st.columns(2)
-#        with col1:
-#            neuron_weights = [st.slider(f"L{i+1}N{j+1} Weight {k+1}", min_value=-10.0, max_value=10.0, value=float(w), step=0.1) for k, w in enumerate(neuron.weights)]
-#        with col2:
-#            neuron_bias = st.slider(f"L{i+1}N{j+1} Bias", min_value=-10.0, max_value=10.0, value=float(neuron.bias), step=0.1)
-#        layer_weights.append(neuron_weights)
-#        layer_biases.append(neuron_bias)
-#    mlp_weights.append(layer_weights)
-#    mlp_biases.append(layer_biases)
-
-# Set MLP weights and biases
-#mlp.set_weights_and_biases(mlp_weights, mlp_biases)
-
-# Calculate MLP output
-#mlp_output = mlp.forward(inputs)
-
-#st.write(f"## Multi-Layer Perceptron Output: {mlp_output:.4f}")
-
-# Display MLP Structure
-#st.plotly_chart(create_network_graph(mlp_layer_sizes, is_mlp=True))
-
-# Create 3D visualization for MLP
-#Z_mlp = np.zeros_like(X)
-
-#for i in range(X.shape[0]):
-#    for j in range(X.shape[1]):
-#        viz_inputs = [X[i, j], Y[i, j]]
-#        full_inputs = viz_inputs + inputs[2:]
-#        full_inputs = full_inputs[:mlp.layers[0][0].num_inputs] + [0] * (mlp.layers[0][0].num_inputs - len(full_inputs))
-#        Z_mlp[i, j] = mlp.forward(full_inputs)
-
-#uirevision_params_mlp = {
-#    'weights': mlp_weights,
-#    'biases': mlp_biases,
-#    'activation': activation_function
-#}
-#st.plotly_chart(create_3d_graph(X, Y, Z_mlp, "MLP Output Surface", uirevision_params_mlp))
-
-# New section: Form for MLP input
-#st.subheader("Test Multi-Layer Perceptron")
-#col1, col2 = st.columns(2)
-
-#with col1:
-#    mlp_input1 = st.number_input("MLP Input 1", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
-#    mlp_input2 = st.number_input("MLP Input 2", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
-
-#with col2:
-#    if st.button("Calculate MLP Output"):
-#        mlp_test_inputs = [mlp_input1, mlp_input2] + inputs[2:]
-#        mlp_test_inputs = mlp_test_inputs[:mlp.layers[0][0].num_inputs] + [0] * (mlp.layers[0][0].num_inputs - len(mlp_test_inputs))
-#        mlp_test_output = mlp.forward(mlp_test_inputs)
-#        st.write(f"MLP Output: {mlp_test_output:.4f}")
-
-# Add a section for the neural network
-st.header("Simple Neural Network")
-
-# Create a SimpleNeuralNetwork instance
-nn = SimpleNeuralNetwork(input_size=1, hidden_size=3, output_size=1, use_standard_scalar=True)
-X = np.array([[-1], [0], [1], [2], [3], [4]])
-y = np.array([4, 3, 2, 1, 0, -1])
-nn.train(X, y, epochs=10000, learning_rate=0.1)
-
-# Add a slider for the input
-nn_input = st.slider("Neural Network Input", min_value=-10.0, max_value=10.0, value=0.0, step=0.1)
-
-# Make a prediction
-nn_output = nn.predict([nn_input])
-
-# Display the prediction
-st.write(f"Neural Network Output: {nn_output[0]:.4f}")
 
 
 # Create a function to draw the network
@@ -397,42 +308,6 @@ def draw_neural_network(nn):
     plt.axis('off')
     return plt
 
-st.subheader("Neural Network Input-Output Relationship")
-# Create input data
-x = np.linspace(-10, 10, 200)
-# Get predictions
-y = np.array([nn.predict([xi]) for xi in x])
-# Create the plot
-fig, ax = plt.subplots(figsize=(8, 4))
-ax.plot(x, y, 'b-', linewidth=2)
-ax.set_xlabel('Input', fontsize=12)
-ax.set_ylabel('Output', fontsize=12)
-ax.set_title('Neural Network Input-Output Relationship', fontsize=14)
-ax.grid(True, linestyle='--', alpha=0.7)
-# Add reference lines
-ax.axhline(y=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
-ax.axvline(x=0, color='k', linestyle='--', linewidth=1, alpha=0.5)
-# Set axis limits
-ax.set_xlim(-10, 10)
-y_min, y_max = y.min(), y.max()
-y_range = y_max - y_min
-ax.set_ylim(y_min - 0.1 * y_range, y_max + 0.1 * y_range)
-
-# Display the plot in Streamlit
-#st.pyplot(fig)
-st.plotly_chart(fig)
-# Clear the matplotlib figure to free up memory
-plt.clf()
-
-# Visualize the neural network structure
-st.subheader("Neural Network Structure")
-fig = draw_neural_network(nn)
-st.pyplot(fig)
-plt.clf()
-
-
-
-
 st.write("## How it works")
 st.write("""
 1. Adjust the number of inputs, input values, weights, and bias using the sliders above for both the single neuron and the MLP.
@@ -454,5 +329,6 @@ st.write("- w_i are the weights")
 st.write("- x_i are the inputs")
 st.write("- b is the bias")
 st.write("- Subscripts 1, 2, 3 represent layers in the MLP")
+
 
 
