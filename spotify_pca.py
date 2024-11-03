@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 
 pd.set_option('display.max_columns', None)
 
@@ -20,20 +21,30 @@ pd.set_option('display.max_columns', None)
 
 
 data = pd.read_csv('./data/modified_spotify.csv', encoding="ISO-8859-1")
-#df_encoded = pd.get_dummies(data, columns=['key', 'mode'], drop_first=True)
-#scaler = StandardScaler()
-#data[['key', 'mode']] = scaler.fit_transform(data[['key', 'mode']])
-categorical_columns = ['key', 'mode'] 
+categorical_columns = ['key', 'mode', 'in_deezer_playlists', 'in_shazam_charts'] 
 label_encoder = LabelEncoder()
 for column in categorical_columns:
     data[f'{column}'] = label_encoder.fit_transform(data[column])
-print(data.info())
-print(data.head())
 
-#data = data[['bpm', 'key', 'mode', 'energy_%', 'streams']]
-data = data[['bpm', 'acousticness_%', 'instrumentalness_%', 'energy_%', 'streams']]
+X = data.drop(columns=['streams', 'track_name', 'artist(s)_name'])
+y = data['streams']
 
-sns.pairplot(data, hue='streams')
+# Step 1: Standardize the features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+
+# Step 2: Apply PCA (specifying the number of components, e.g., 2 components)
+pca = PCA(n_components=2)  # You can adjust the number of components based on your requirement
+X_pca = pca.fit_transform(X_scaled)
+
+pca_components = pca.components_
+loadings_df = pd.DataFrame(pca_components, columns=X.columns)
+
+plt.figure(figsize=(10, 8))
+sns.heatmap(loadings_df.T, cmap='coolwarm', annot=True)
+plt.title('PCA Loadings (Original Features to Components)')
+plt.xlabel('Principal Components')
+plt.ylabel('Original Features')
 plt.show()
-
 

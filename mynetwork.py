@@ -43,7 +43,7 @@ def draw_neural_network(nn):
     node_sizes.append(1000)
 
     # Hidden layer
-    for i in range(3):
+    for i in range(2):
         node = f"H{i+1}"
         G.add_node(node)
         pos[node] = (1, i - 1)
@@ -59,7 +59,7 @@ def draw_neural_network(nn):
     node_colors.append('salmon')
     node_sizes.append(1000)
 
-    for i in range(3):
+    for i in range(2):
         weight = nn.output_neuron.weights[i]
         G.add_edge(f"H{i+1}", "O1")
         edge_labels[(f"H{i+1}", "O1")] = f"{weight:.2f}"
@@ -71,7 +71,7 @@ def draw_neural_network(nn):
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_size=12)
 
     # Add bias annotations
-    for i, node in enumerate(["I1", "H1", "H2", "H3", "O1"]):
+    for i, node in enumerate(["I1", "H1", "H2", "O1"]):
         if node == "I1":
             bias = 0
         elif node == "O1":
@@ -104,7 +104,7 @@ if st.button("Train Neural Network"):
     y = edited_df['Output'].values
 
     # Create a SimpleNeuralNetwork instance
-    nn = SimpleNeuralNetwork(input_size=1, hidden_size=3, output_size=1, use_standard_scalar=True)
+    nn = SimpleNeuralNetwork(input_size=1, hidden_size=2, output_size=1, use_standard_scalar=False)
     
     # Train the network
     nn.train(X, y, epochs=10000, learning_rate=0.1)
